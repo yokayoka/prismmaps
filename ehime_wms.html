@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>CSMap Test Site for PRISM</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.2/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.0.2/dist/leaflet.js"></script>
+<script src="lib/L.TileLayer.BetterWMS.js"></script>
+<script src="lib/proj4.js"></script>
+<script src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
+
+<style>
+  body {padding: 0; margin: 0}
+  html, body, #mapDiv {height: 100%; width: 100%;}
+</style>
+</head>
+
+<body>
+<div id="mapDiv"></div>
+<script>
+var map = L.map('mapDiv',{crs:L.CRS.EPSG900913}).setView([33.226680, 132.567725], 14);
+
+var cyberjapanstd = L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png', {
+attribution: '<a href="http://maps.gsi.go.jp/development/ichiran.html" target="_blank">地理院タイル</a>',
+zIndex: 100,
+opacity: 0.7
+}).addTo(map);
+
+var wmsLayer = L.tileLayer.wms('http://www.j-shis.bosai.go.jp/map/wms/landslide?', {
+    layers: 'L-V3-ALL',
+    opacity: 0.7,
+}).addTo(map);
+
+var detailLayer = L.tileLayer.betterWms('https://gbank.gsj.jp/ows/seamlessgeology200k_b' ,{
+			layers: 'area',
+			format: 'image/png',
+			transparent : true,
+			opacity: 0.7,
+			zIndex: 2000,
+			attribution: '<a href="https://www.gsj.jp/license/index.html" target="_blank">GSJ, AIST</a>'
+		}).addTo(map);
+
+		//ラベルの表示
+		var labelLayer = L.tileLayer.betterWms('https://gbank.gsj.jp/ows/seamlessgeology200k_b' ,{
+			layers: 'label',
+			format: 'image/png',
+			transparent : true,
+			opacity: 1.0,
+			zIndex: 1000,
+			attribution: '<a href="https://www.gsj.jp/license/index.html" target="_blank">GSJ, AIST</a>'
+		});
+
+		//ラインの表示
+		var lineLayer = L.tileLayer.betterWms('https://gbank.gsj.jp/ows/seamlessgeology200k_b' ,{
+			layers: 'line',
+			format: 'image/png',
+			transparent : true,
+			opacity: 0.8,
+			zIndex: 3000,
+			attribution: '<a href="https://www.gsj.jp/license/index.html" target="_blank">GSJ, AIST</a>'
+		});
+
+var csehime = L.tileLayer('https://tile.gkan.jp/forest/ehimecs/{z}/{x}/{y}.png', {
+				minZoom: 8,
+				maxZoom: 18,
+		    opacity: 0.7
+		}).addTo(map);
+
+var hijikawa0718 = L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/201807H3007gouu_hijikawa_0718do/{z}/{x}/{y}.png', {
+				minZoom: 10,
+				maxZoom: 18,
+		    opacity: 0.7
+		}).addTo(map);
+
+var uwajima0711 = L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/201807H3007gouu_uwajima_0711do/{z}/{x}/{y}.png', {
+		    minZoom: 10,
+			maxZoom: 18,
+		    opacity: 0.7
+		}).addTo(map);
+      
+var ohsu0711 = L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/201807H3007gouu_ozu_0711do/{z}/{x}/{y}.png', {
+		    minZoom: 10,
+			maxZoom: 18,
+		    opacity: 0.7
+		}).addTo(map);
+
+var Layers = {
+'地理院地図 (標準地図)': cyberjapanstd,
+};
+
+// Overlay layers are grouped
+var Overlays = {
+  '地質図 (基本版)': detailLayer,
+  '地すべり': wmsLayer,
+  '愛媛県CS立体図': csehime,
+  '地質図ライン': lineLayer,
+  '地質図ラベル': labelLayer,
+  '地理院オルソ肱川地区（2018/7/18）': hijikawa0718,
+  '地理院オルソ宇和島地区（2018/7/11）': uwajima0711,
+  '地理院オルソ大洲地区（2018/7/11）': ohsu0711,    
+};
+
+//レイヤコントロールを表示
+L.control.layers(Layers, Overlays, {collapsed: true }).addTo(map);
+//スケールコントロールを表示（オプションはフィート単位を非表示）
+L.control.scale({imperial: false}).addTo(map);
+
+</script>
+</body>
+</html>
